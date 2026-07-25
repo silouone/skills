@@ -2,7 +2,7 @@
 name: ai-usage-card
 description: Run the AI Usage Card — a calibrated, local-only self-assessment of how the user actually operates Codex. Inspects their ~/.codex setup and usage read-only, scores an L0–L5 level, and prints a shareable card + JSON line. Use when the user asks for their usage card, AI usage level, harness assessment, or to "run the usage card". Nothing is sent anywhere.
 ---
-<!-- core-hash: cdaec4bd6230 -->
+<!-- core-hash: e1057315444e -->
 
 # AI Usage Card (Codex)
 

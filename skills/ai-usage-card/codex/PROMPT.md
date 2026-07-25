@@ -1,4 +1,4 @@
-<!-- core-hash: cdaec4bd6230 -->
+<!-- core-hash: e1057315444e -->
 # AI Usage Card — Codex (paste-in prompt)
 
 The Codex variant of the AI Usage Card: a calibrated self-assessment you run
@@ -100,7 +100,8 @@ AGENT-INITIATED:
 Emit `harness_driver` as one enum: `mostly-typed` | `mixed` | `mostly-agent-initiated`.
 
 Calibration caution:
-- Agent-initiated orchestration is partly a Codex default. A high agent-initiated count is not by itself evidence of skill. On its own it supports L2-L3, but L4+ needs user-authored delegation machinery, enforced/habitual verification, or a clearly operated harness.
+- Agent-initiated orchestration is partly a Codex default. A high agent-initiated count is not by itself evidence of skill. On its own it supports L2, but L3+ needs user-authored delegation machinery.
+- Manual multiplexing is not delegation. N sessions/tabs open side by side, each with one top-level agent the runner steers themselves, is single-thread work repeated N times. It adds nothing to the level. Delegation means work handed to machinery that runs without them in its loop: directed fan-out, worktrees, background/headless runs, scheduling.
 - Typed commands can be contaminated by pasted prompts, skill text, and system instructions. Prefer user-authored turns over raw string counts.
 
 STEP 1d - CONTEXT AND AUTOMATION SURFACE
@@ -140,7 +141,7 @@ Verification loop:
 - Require command-position matches. Do not count prose mentions or bare words like `make` unless there is an explicit target/flag.
 - Check config/hooks for PostToolUse or command hooks that auto-run tests/lint/build.
 - Emit `verification_loop`: `enforced` | `habitual` | `ad-hoc` | `none`.
-- Gate: `none` caps at L2; `ad-hoc` caps at L3; `habitual` or `enforced` is needed for L4+.
+- Gate: `none` or `ad-hoc` caps at L2; `habitual` is needed for L3+; `habitual` or `enforced` for L4+.
 
 Autonomy posture:
 - Inspect sandbox, approvals, default modes, permissions, allow/deny lists, escalation patterns, and guardrail hooks.
@@ -202,16 +203,17 @@ STEP 3 - SCORE MY LEVEL
 Pick ONE level and give a one-line justification. Score HOW I OPERATE and what I AUTHORED, not merely what is installed.
 
 Gates and modifiers:
-- Verification: `none` caps at L2; `ad-hoc` caps at L3; `habitual` or `enforced` is needed for L4+.
+- Verification: `none` or `ad-hoc` caps at L2; `habitual` is needed for L3+; `habitual` or `enforced` for L4+. Not negotiable against an impressive-looking kit: L3's own definition requires habitual verification.
 - Authorship: inherited/installed kit should be flagged. Judge on actual operation. Deny "L4 by merely cloning a config."
-- Agent-initiated does not equal skill. It supports L2-L3 on its own; L4+ needs user-authored delegation, verification, living context, or observability.
-- Role vs evidence: claimed engineering role but no code/tests/git in transcripts should be called out. Skilled non-engineering automators can be L2-L3, but usually not L4 without authored engineering or quality gates.
+- Agent-initiated does not equal skill. It supports L2 on its own; L3+ needs user-authored delegation, not the runtime orchestrating by default.
+- Role vs evidence: claimed engineering role but no code/tests/git in transcripts should be called out. A skilled non-engineering automator (ops, data, design, product) tops out at L2 on this ladder - a statement about what this ladder measures, not a verdict on their work. L3+ requires authored engineering.
+- Never name a target rung ("L3 aiming at L4"). The rungs are not a promotion track. Name the concrete missing artifact instead.
 
 Levels:
 - L0 Explorer - occasional chat-style use, default setup.
 - L1 Daily Helper - regular interactive use; little or no authored config; mostly eyeballs output.
 - L2 Power User - uses multiple modes/tools/models/skills/MCP/plugins; some verification; still mostly hand-drives.
-- L3 Agent Builder - delegates real work, gives Codex reusable context, verifies habitually or near-habitually, and has authored some machinery OR operates a serious inherited harness fluently.
+- L3 Agent Builder - all three, not any one: habitual verification, genuine delegation (directed fan-out / background runs, not several chats at once), and at least one nameable authored-or-deliberately-adopted mechanism (a command, agent, skill, quality gate, or non-trivial context file). Fluently operating an inherited harness satisfies the third; "the runtime orchestrates for me" does not. If the artifact cannot be named, it is not L3.
 - L4 Harness Engineer - operates an authored system: hooks or quality gates, wide autonomy with guardrails, agent-driven orchestration they built, living memory/context, and some observability. This is the genuine "built a harness around the model" tier.
 - L5 Force Multiplier - frontier: multi-agent systems at scale, evals/quality gates, real observability, and tooling or automation that multiplies a whole team. Rare.
 
