@@ -1,0 +1,7 @@
+interface:
+  display_name: "Sitrep"
+  short_description: "Current-work status from durable evidence"
+  default_prompt: "Use $sitrep to give me a concise status report on the current work."
+
+policy:
+  allow_implicit_invocation: false
