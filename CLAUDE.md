@@ -1,4 +1,4 @@
-# CLAUDE.md
+# AGENTS.md
 
 Agent skills for **Claude Code** and **Codex**. Local-only by design: every
 skill here reads and writes files on the runner's machine, and nothing is

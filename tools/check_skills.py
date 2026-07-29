@@ -81,6 +81,40 @@ def check_skill(skill_dir: Path) -> list[str]:
     return failures
 
 
+def check_prompt_keys(skill_dir: Path) -> list[str]:
+    """Every key a PROMPT.md's JSON contract promises must be produced somewhere.
+
+    A skill whose prompt ends in an enum block plus a `Keys:` list is making a
+    schema promise to whatever aggregates the output. A key that appears ONLY
+    in that list has no enum and no step that fills it, so every run invents
+    its own value — the failure is silent and only shows up as a ruined
+    dataset. Requiring each key to be named somewhere else in the prompt is
+    what makes the promise checkable.
+    """
+    prompt = skill_dir / "PROMPT.md"
+    if not prompt.is_file():
+        return []
+    text = prompt.read_text()
+    if "\nKeys:\n" not in text or "Use these enums:" not in text:
+        return []
+
+    body, _, tail = text.partition("Use these enums:")
+    enum_block, _, keys_block = tail.partition("\nKeys:\n")
+    enums = set(re.findall(r"^\s{2}(\w+)", enum_block, re.M))
+    keys = [k.strip() for k in keys_block.split("\n\n")[0].replace("\n", " ").split(",")]
+
+    orphans = [
+        key
+        for key in keys
+        if key and key not in enums and not re.search(rf"\b{re.escape(key)}\b", body)
+    ]
+    return [
+        f"{skill_dir.name}/PROMPT.md: key `{key}` is in the Keys list but has no "
+        f"enum and is never named in the prompt — nothing produces it"
+        for key in orphans
+    ]
+
+
 def check_plugin_manifest(names: list[str]) -> list[str]:
     if not PLUGIN_MANIFEST.is_file():
         return [f"{PLUGIN_MANIFEST.relative_to(ROOT)}: missing"]
@@ -95,6 +129,7 @@ def check_plugin_manifest(names: list[str]) -> list[str]:
 def main() -> int:
     names = sorted(d.name for d in SKILLS.iterdir() if d.is_dir())
     failures = [f for name in names for f in check_skill(SKILLS / name)]
+    failures += [f for name in names for f in check_prompt_keys(SKILLS / name)]
     failures += check_plugin_manifest(names)
 
     if failures:
