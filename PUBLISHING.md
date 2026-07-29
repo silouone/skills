@@ -3,61 +3,59 @@
 Every skill published here carries the same guarantees. This file is the
 checklist that keeps them true.
 
-## 1. Dual-variant rule
+## 1. One skill, one folder, both runtimes
 
-A skill lands with **three parts or it doesn't land**:
+A skill lands with **two parts or it doesn't land**:
 
-- `skills/<name>/CORE.md` — the platform-neutral contract (what the skill
-  does, inputs, output shapes, guarantees).
-- `skills/<name>/claude/` — a complete, installable Claude Code skill folder.
-- `skills/<name>/codex/` — a complete, installable Codex skill folder,
-  including `agents/openai.yaml` (Codex reads it for the skill's display
-  name, one-liner, and invocation policy).
+- `skills/<name>/SKILL.md` — the skill itself, in runtime-neutral prose.
+  Claude Code reads its YAML frontmatter; the frontmatter `name` must equal
+  the folder name, because **that is the invocation name on both runtimes**.
+- `skills/<name>/agents/openai.yaml` — what Codex reads for the skill's
+  display name, one-liner, and invocation policy. Without it Codex falls back
+  to the raw folder name.
 
-Every `SKILL.md` is either **user-invoked** or **model-invoked**, and the two
-variants must agree: user-invoked means `disable-model-invocation: true` in
-the Claude frontmatter *and* `policy.allow_implicit_invocation: false` in
-`agents/openai.yaml`. A skill the model may reach on one runtime but not the
-other is a bug, not a platform variance.
+`scripts/` and other assets sit alongside them. There is no per-runtime
+variant folder and no build step.
 
-Adapters embed `<!-- core-hash: … -->`. After editing any `CORE.md`:
+Where the runtimes genuinely differ — config paths, a capability one lacks —
+the skill names both cases inline (`~/.claude/settings.json` *or*
+`~/.codex/config.toml`). A divergence too large to write that way is a signal
+to give it an explicit section, never a second copy of the file.
+
+Every skill is either **user-invoked** or **model-invoked**, and the two
+runtimes must agree: user-invoked means `disable-model-invocation: true` in
+the frontmatter *and* `policy.allow_implicit_invocation: false` in
+`agents/openai.yaml`; model-invocable means neither. A skill the model may
+reach on one runtime but not the other is a bug.
 
 ```bash
-# revisit BOTH adapters first, then:
-python3 tools/check_drift.py --stamp
-python3 tools/check_drift.py   # must print OK
+python3 tools/check_skills.py   # must print OK
 ```
-
-Files shipped identically in both variants (e.g. `scripts/`) must stay
-byte-identical — the drift check enforces this too. Intentional platform
-variance (a capability one runtime lacks) is documented in the skill's
-`CORE.md` under "Known platform variance", never left implicit.
 
 ## 2. Distribution manifests
 
 The repo is its own single-plugin Claude Code marketplace:
 
 - `.claude-plugin/plugin.json` — the plugin. Its `skills` array lists each
-  published skill's **claude adapter path** (`./skills/<name>/claude`). The
-  invocation name comes from the adapter's frontmatter `name:`, not the
-  folder — which is what lets three folders all called `claude/` install as
-  `ingest`, `ai-usage-card`, and `sitrep`.
+  published skill's folder (`./skills/<name>`) and is exactly what ships.
 - `.claude-plugin/marketplace.json` — the catalogue, one entry sourced at
   `./`.
 
-Every skill's claude adapter has an entry in the `skills` array and no stale
-entries linger — `tools/check_drift.py` fails on either. Bump `version` in
-`plugin.json` when publishing; Claude uses it to decide when installed users
-see an update. After touching either manifest:
+Every skill has an entry and no stale entries linger — `check_skills.py`
+fails on either. Bump `version` in `plugin.json` when publishing; Claude uses
+it to decide when installed users see an update. After touching either
+manifest:
 
 ```bash
 claude plugin validate . --strict   # must print Validation passed
 ```
 
-Codex has no equivalent manifest — its plugin format takes `skills` as a
-single path string and drops symlinks on install, so a curated subset of this
-layout can't be expressed. `install.sh` is the Codex path, and stays the
-runtime-neutral one.
+Codex has no equivalent manifest — per [mattpocock/skills ADR 0002], its
+plugin format takes `skills` as a single path string and drops symlinks on
+install, so a curated subset can't be expressed. `npx skills@latest add
+silouone/skills` is the Codex route, and stays the runtime-neutral one.
+
+[mattpocock/skills ADR 0002]: https://github.com/mattpocock/skills/blob/main/.agents/adr/0002-ship-as-a-claude-code-plugin.md
 
 ## 3. Sanitization gate
 
@@ -85,14 +83,14 @@ captions), and each skill's docs must state exactly which calls those are.
 
 ## 5. Release checklist
 
-1. `python3 tools/check_drift.py` → OK
+1. `python3 tools/check_skills.py` → OK
 2. `claude plugin validate . --strict` → Validation passed
 3. Sanitization sweep → clean
-4. Fresh-install walkthrough against a throwaway root:
-   `./install.sh --claude --dir "$(mktemp -d)"`, twice — the second run must
-   produce the same tree (no nested `claude/` level), and `SKILL.md` must sit
-   at depth 1. Then install for real on at least one platform, run the skill
-   on a real input, and confirm the documented outputs appear.
-5. README skill index updated. `install.sh` discovers skills from the
+4. Fresh-install walkthrough on both routes:
+   `npx skills@latest add silouone/skills --list` must show every published
+   skill, and the plugin must resolve them — add the marketplace and install
+   into a throwaway `CLAUDE_CONFIG_DIR`. Then run one skill on a real input
+   and confirm the documented outputs appear.
+5. README skill index updated. Both install routes discover skills from the
    directory listing, so a new skill needs no installer edit — but it does
-   need both variant folders to exist, and an entry in `plugin.json`.
+   need an entry in `plugin.json`.

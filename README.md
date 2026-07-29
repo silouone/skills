@@ -1,8 +1,8 @@
 # skills
 
 Agent skills I author, use daily, and publish for both **Claude Code** and
-**Codex** — every skill ships in two maintained variants built around one
-shared core, so your runtime choice never decides whether you get to use it.
+**Codex** — one folder per skill, read by both runtimes, so your runtime
+choice never decides whether you get to use it.
 
 Local-only by design: these skills read and write files on *your* machine.
 Nothing is uploaded anywhere.
@@ -18,45 +18,36 @@ Nothing is uploaded anywhere.
 ## Install (1 minute)
 
 Two routes, two philosophies. The **plugin** subscribes you to the set as a
-managed bundle that updates when I ship — Claude Code only. **`install.sh`**
-copies the skills into whichever runtimes you have, Claude *and* Codex, and
-leaves them as ordinary files you can edit. Pick one; installing both leaves
-you with every skill twice.
+managed, read-only bundle that updates when I ship — Claude Code only.
+**skills.sh** copies editable skill files onto any agent, so you can hack on
+them and make them your own. Pick one; installing both leaves you with every
+skill twice.
 
-**Claude Code plugin**
+<details>
+<summary><strong>Claude Code</strong></summary>
 
 ```
 /plugin marketplace add silouone/skills
 /plugin install silouone-skills@silouone
 ```
 
-Skills arrive namespaced: `/silouone-skills:ingest`.
+Skills arrive namespaced: `/silouone-skills:ingest`. Updates come with the
+plugin — nothing to re-run.
 
-**Script (both runtimes)**
+</details>
 
-```bash
-git clone https://github.com/silouone/skills.git
-cd skills
-./install.sh
-```
-
-That installs every skill into every runtime it finds — the `claude/` variant
-into `~/.claude/skills/`, the `codex/` variant into `~/.codex/skills/`, with
-the variant folder flattened away so each skill sits at
-`<runtime>/skills/<name>/SKILL.md`. Re-run it any time to update; it's
-idempotent.
+<details>
+<summary><strong>Codex, and any other agent</strong></summary>
 
 ```bash
-./install.sh ingest sitrep     # only these skills
-./install.sh --claude          # only this runtime (or --codex)
-./install.sh --dry-run         # print the plan, change nothing
-./install.sh --help            # every flag
+npx skills@latest add silouone/skills
 ```
 
-It honours `$CLAUDE_CONFIG_DIR` / `$CODEX_HOME`, and `--dir <path>` installs
-into a project instead of your home directory. It **refuses to overwrite a
-skill folder it didn't install** — so a hand-edited copy of your own is safe
-until you pass `--force`.
+Pick the skills you want and which agents to install them on. Works for
+Claude Code too, if you'd rather own editable files than subscribe to the
+plugin.
+
+</details>
 
 Then, in Claude Code: `/reload-skills`, and `/ingest <youtube-url>` or
 `/ai-usage-card` (or just ask in natural language — the skills trigger on
@@ -64,32 +55,38 @@ intent). In Codex: start a fresh session and invoke the skill by name (e.g.
 `$ingest`) or ask for it in natural language.
 
 **No install at all** — `ai-usage-card` also works as a plain paste-in
-prompt: open the [`PROMPT.md`](./skills/ai-usage-card/claude/PROMPT.md) for
-your platform ([Codex version](./skills/ai-usage-card/codex/PROMPT.md)), copy
-the box, paste it into a session.
+prompt: open [`PROMPT.md`](./skills/ai-usage-card/PROMPT.md), copy the box,
+paste it into a session on either runtime.
 
 The `ingest` transcript fetcher needs [`uv`](https://docs.astral.sh/uv/)
 (single-file script, dependencies resolve on first run — no environment to
 set up).
 
-## Why two variants per skill
+## One skill, one folder, both runtimes
 
-Half the people I share a skill with run a different agent runtime than I do.
-A skill maintained for one runtime is a skill half your team can't use — and
-hand-copied ports drift within weeks. Here, each skill has:
+Half the people I share a skill with run a different agent than I do. A skill
+maintained for one runtime is a skill half your team can't use — and a
+hand-copied port drifts within weeks. So there is no port: one folder is the
+skill, and both runtimes read it.
 
 ```
 skills/<name>/
-├── CORE.md      # the platform-neutral contract — single source of truth
-├── claude/      # complete installable skill for Claude Code
-└── codex/       # complete installable skill for Codex
+├── SKILL.md            # the skill — Claude Code reads its YAML frontmatter
+├── agents/openai.yaml  # Codex reads this: display name, one-liner, policy
+└── scripts/            # optional
 ```
 
-Adapters are stamped with the hash of the `CORE.md` they were written
-against; [`tools/check_drift.py`](./tools/check_drift.py) fails when a core
-changes without its adapters being revisited, and when files shared by both
-variants stop being byte-identical. Maintenance is enforced by tooling, not
-discipline. See [`PUBLISHING.md`](./PUBLISHING.md).
+`SKILL.md` is runtime-neutral prose. Where the runtimes genuinely differ —
+config paths, a capability one lacks — the skill names both cases inline
+instead of forking the file.
+
+[`tools/check_skills.py`](./tools/check_skills.py) enforces the parts that
+rot quietly: the frontmatter `name` matches the folder (it's the invocation
+name on both runtimes), every skill ships an `openai.yaml`, every skill is
+listed in the plugin manifest with no stale entries, and the two runtimes
+agree on whether the model may invoke a skill. Maintenance by tooling, not
+discipline. Conventions live in [`CLAUDE.md`](./CLAUDE.md); publishing rules
+in [`PUBLISHING.md`](./PUBLISHING.md).
 
 ## License
 

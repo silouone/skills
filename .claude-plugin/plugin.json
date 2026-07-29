@@ -17,8 +17,8 @@
     "local-only"
   ],
   "skills": [
-    "./skills/ingest/claude",
-    "./skills/ai-usage-card/claude",
-    "./skills/sitrep/claude"
+    "./skills/ingest",
+    "./skills/ai-usage-card",
+    "./skills/sitrep"
   ]
 }
