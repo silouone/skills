@@ -15,32 +15,53 @@ Nothing is uploaded anywhere.
 | [`ai-usage-card`](./skills/ai-usage-card) | A calibrated, local-only self-assessment of how you actually *operate* your coding agent. Scores an L0–L5 level from measured behavior (verification loop, autonomy, authorship — not installed kit) and prints a shareable card + JSON line. |
 | [`sitrep`](./skills/sitrep) | "Where are we at?" — one scannable, evidence-first status report on the current session: objective with measured %, in-flight task, subagent states, ETA in countable units, blockers, next action. Disk first, conversation second; never invents a number. |
 
-## Install (2 minutes)
+## Install (1 minute)
 
-Each skill folder contains a `claude/` and a `codex/` variant. Copy the one
-for your runtime:
+Two routes, two philosophies. The **plugin** subscribes you to the set as a
+managed bundle that updates when I ship — Claude Code only. **`install.sh`**
+copies the skills into whichever runtimes you have, Claude *and* Codex, and
+leaves them as ordinary files you can edit. Pick one; installing both leaves
+you with every skill twice.
 
-**Claude Code**
+**Claude Code plugin**
+
+```
+/plugin marketplace add silouone/skills
+/plugin install silouone-skills@silouone
+```
+
+Skills arrive namespaced: `/silouone-skills:ingest`.
+
+**Script (both runtimes)**
 
 ```bash
 git clone https://github.com/silouone/skills.git
-cp -r skills/skills/ingest/claude ~/.claude/skills/ingest
-cp -r skills/skills/ai-usage-card/claude ~/.claude/skills/ai-usage-card
+cd skills
+./install.sh
 ```
 
-Then in any Claude Code session: `/ingest <youtube-url>` or `/ai-usage-card`
-(or just ask in natural language — the skills trigger on intent).
-
-**Codex**
+That installs every skill into every runtime it finds — the `claude/` variant
+into `~/.claude/skills/`, the `codex/` variant into `~/.codex/skills/`, with
+the variant folder flattened away so each skill sits at
+`<runtime>/skills/<name>/SKILL.md`. Re-run it any time to update; it's
+idempotent.
 
 ```bash
-git clone https://github.com/silouone/skills.git
-cp -r skills/skills/ingest/codex ~/.codex/skills/ingest
-cp -r skills/skills/ai-usage-card/codex ~/.codex/skills/ai-usage-card
+./install.sh ingest sitrep     # only these skills
+./install.sh --claude          # only this runtime (or --codex)
+./install.sh --dry-run         # print the plan, change nothing
+./install.sh --help            # every flag
 ```
 
-Then invoke the skill by name in a fresh Codex session (e.g. `$ingest` in the
-CLI, or ask for it in natural language).
+It honours `$CLAUDE_CONFIG_DIR` / `$CODEX_HOME`, and `--dir <path>` installs
+into a project instead of your home directory. It **refuses to overwrite a
+skill folder it didn't install** — so a hand-edited copy of your own is safe
+until you pass `--force`.
+
+Then, in Claude Code: `/reload-skills`, and `/ingest <youtube-url>` or
+`/ai-usage-card` (or just ask in natural language — the skills trigger on
+intent). In Codex: start a fresh session and invoke the skill by name (e.g.
+`$ingest`) or ask for it in natural language.
 
 **No install at all** — `ai-usage-card` also works as a plain paste-in
 prompt: open the [`PROMPT.md`](./skills/ai-usage-card/claude/PROMPT.md) for
