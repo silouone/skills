@@ -3,3 +3,4 @@
 transcripts/
 .claude
 .codex
+__pycache__/
