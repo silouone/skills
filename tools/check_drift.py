@@ -10,11 +10,18 @@ so editing CORE.md forces every adapter to be revisited (and re-stamped) in
 the same commit. Files shipped in BOTH platform folders under the same
 relative path (e.g. scripts/) must stay byte-identical.
 
+Two distribution invariants are checked alongside the hashes: every claude/
+adapter is listed in the plugin manifest's `skills` array (the Claude Code
+plugin ships exactly the published set), and every codex/ adapter exposes
+agents/openai.yaml (Codex reads it for the skill's display metadata and
+invocation policy).
+
 Usage:
     python3 tools/check_drift.py          # verify, exit 1 on drift
     python3 tools/check_drift.py --stamp  # rewrite markers to current hash
 """
 import hashlib
+import json
 import re
 import sys
 from pathlib import Path
@@ -23,27 +30,52 @@ ROOT = Path(__file__).resolve().parent.parent
 MARKER = re.compile(r"<!-- core-hash: ([0-9a-f]{12}|PENDING) -->")
 PLATFORMS = ("claude", "codex")
 STAMPED_NAMES = {"SKILL.md", "PROMPT.md"}
+PLUGIN_MANIFEST = ROOT / ".claude-plugin" / "plugin.json"
 
 
 def core_hash(core: Path) -> str:
     return hashlib.sha256(core.read_bytes()).hexdigest()[:12]
 
 
+def check_plugin_manifest(skill_names: list[str]) -> list[str]:
+    """Every claude/ adapter listed in plugin.json, and nothing stale."""
+    if not PLUGIN_MANIFEST.is_file():
+        return [f"{PLUGIN_MANIFEST.relative_to(ROOT)}: missing"]
+
+    listed = set(json.loads(PLUGIN_MANIFEST.read_text()).get("skills", []))
+    expected = {f"./skills/{name}/claude" for name in skill_names}
+    rel = PLUGIN_MANIFEST.relative_to(ROOT)
+    return [
+        f"{rel}: {verb} `skills` entry {path}"
+        for verb, path in (
+            [("missing", p) for p in sorted(expected - listed)]
+            + [("stale", p) for p in sorted(listed - expected)]
+        )
+    ]
+
+
 def main() -> int:
     stamp = "--stamp" in sys.argv
     failures: list[str] = []
+    skill_names: list[str] = []
 
     for skill_dir in sorted((ROOT / "skills").iterdir()):
         core = skill_dir / "CORE.md"
         if not core.is_file():
             continue
         expected = core_hash(core)
+        skill_names.append(skill_dir.name)
 
         for platform in PLATFORMS:
             platform_dir = skill_dir / platform
             if not platform_dir.is_dir():
                 failures.append(f"{skill_dir.name}: missing {platform}/ variant")
                 continue
+            if platform == "codex" and not (platform_dir / "agents" / "openai.yaml").is_file():
+                failures.append(
+                    f"{skill_dir.name}: codex/agents/openai.yaml missing — "
+                    f"Codex needs it for display metadata and invocation policy"
+                )
             for file in sorted(platform_dir.rglob("*")):
                 if file.name not in STAMPED_NAMES:
                     continue
@@ -74,6 +106,8 @@ def main() -> int:
                         f"{skill_dir.name}: {file.relative_to(skill_dir)} differs from "
                         f"{twin.relative_to(skill_dir)} — shared files must be byte-identical"
                     )
+
+    failures.extend(check_plugin_manifest(skill_names))
 
     if failures:
         print("DRIFT DETECTED:")

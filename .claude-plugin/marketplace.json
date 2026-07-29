@@ -1,0 +1,22 @@
+{
+  "name": "silouone",
+  "owner": {
+    "name": "silouone",
+    "url": "https://github.com/silouone"
+  },
+  "description": "Agent skills published for both Claude Code and Codex, as an installable Claude Code plugin.",
+  "plugins": [
+    {
+      "name": "silouone-skills",
+      "source": "./",
+      "description": "Local-only agent skills maintained for both runtimes — ingest, ai-usage-card, sitrep.",
+      "category": "productivity",
+      "keywords": [
+        "skills",
+        "ingest",
+        "status-report",
+        "self-assessment"
+      ]
+    }
+  ]
+}

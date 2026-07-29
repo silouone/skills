@@ -1,0 +1,7 @@
+interface:
+  display_name: "AI Usage Card"
+  short_description: "Local-only score of how you operate your agent"
+  default_prompt: "Use $ai-usage-card to assess how I actually operate Codex."
+
+policy:
+  allow_implicit_invocation: true

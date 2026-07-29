@@ -1,0 +1,7 @@
+interface:
+  display_name: "Ingest"
+  short_description: "Source → saved key points, no watching"
+  default_prompt: "Use $ingest to extract the key points of this source: "
+
+policy:
+  allow_implicit_invocation: true

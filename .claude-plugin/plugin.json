@@ -1,0 +1,24 @@
+{
+  "name": "silouone-skills",
+  "version": "1.0.0",
+  "description": "Local-only agent skills maintained for both Claude Code and Codex — ingest a video into key points, score how you actually operate your agent, and get an evidence-first sitrep on the current session.",
+  "author": {
+    "name": "silouone",
+    "url": "https://github.com/silouone"
+  },
+  "homepage": "https://github.com/silouone/skills",
+  "repository": "https://github.com/silouone/skills",
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "ingest",
+    "status-report",
+    "self-assessment",
+    "local-only"
+  ],
+  "skills": [
+    "./skills/ingest/claude",
+    "./skills/ai-usage-card/claude",
+    "./skills/sitrep/claude"
+  ]
+}
