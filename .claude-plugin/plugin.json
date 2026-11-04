@@ -1,7 +1,7 @@
 {
   "name": "silouone-skills",
-  "version": "1.2.0",
-  "description": "Local-only agent skills maintained for both Claude Code and Codex — ingest a video into key points, score how you actually operate your agent, and get an evidence-first sitrep on the current session.",
+  "version": "1.3.0",
+  "description": "Local-only agent skills maintained for both Claude Code and Codex \u2014 ingest a video into key points, score how you actually operate your agent, and get an evidence-first sitrep on the current session.",
   "author": {
     "name": "silouone",
     "url": "https://github.com/silouone"
@@ -19,6 +19,7 @@
   "skills": [
     "./skills/ingest",
     "./skills/ai-usage-card",
-    "./skills/sitrep"
+    "./skills/sitrep",
+    "./skills/keep-alive"
   ]
 }

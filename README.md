@@ -14,6 +14,7 @@ Nothing is uploaded anywhere.
 | [`ingest`](./skills/ingest) | Turn a YouTube URL or local transcript/text file into a saved key-points extraction — core thesis, structured key points, and an applicability assessment grounded in *your* actual setup. Stop watching; start ingesting. |
 | [`ai-usage-card`](./skills/ai-usage-card) | A calibrated, local-only self-assessment of how you actually *operate* your coding agent. Scores an L0–L5 level from measured behavior (verification loop, autonomy, authorship — not installed kit) and prints a shareable card + JSON line. |
 | [`sitrep`](./skills/sitrep) | "Where are we at?" — one scannable, evidence-first status report on the current session: objective with measured %, in-flight task, subagent states, ETA in countable units, blockers, next action. Disk first, conversation second; never invents a number. |
+| [`keep-alive`](./skills/keep-alive) | `/keep-alive 3` keeps the current Claude Code session's prompt cache warm for 3 hours while you're away. A launchd ping resumes a fork of the session, checks that it really read from cache, and stops with a notification if it didn't. Claude Code on macOS. |
 
 ## Install (1 minute)
 

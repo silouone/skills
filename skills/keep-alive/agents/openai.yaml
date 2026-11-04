@@ -1,0 +1,7 @@
+interface:
+  display_name: "Keep-alive"
+  short_description: "Keep a Claude Code session's prompt cache warm for N hours (Claude Code on macOS only)"
+  default_prompt: "Use $keep-alive 3 to keep this session's cache warm for 3 hours."
+
+policy:
+  allow_implicit_invocation: false
