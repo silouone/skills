@@ -1,0 +1,10 @@
+{
+  "name": "blast-radius",
+  "version": "0.1.0",
+  "description": "Asks the person before destructive shell verbs the Python floor misses (find -delete, xargs rm, home-rooted rm -rf, git clean/reset --hard/push --force, DROP TABLE, curl | sh, ...). Observe-only in headless runs.",
+  "types": "./types/index.d.ts",
+  "author": {
+    "name": "silouone",
+    "url": "https://github.com/silouone"
+  }
+}

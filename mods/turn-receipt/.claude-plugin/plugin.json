@@ -1,0 +1,10 @@
+{
+  "name": "turn-receipt",
+  "version": "0.1.0",
+  "description": "Harness-built turn receipt (main-loop tool calls + per-turn git diff delta) as a transcript notice the model never reads, /receipt to show the last one, and a read-only gate badge in the status line.",
+  "author": {
+    "name": "silouone",
+    "url": "https://github.com/silouone"
+  },
+  "types": "./types/index.d.ts"
+}
