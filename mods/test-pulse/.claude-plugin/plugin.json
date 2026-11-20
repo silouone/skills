@@ -1,0 +1,10 @@
+{
+  "name": "test-pulse",
+  "version": "0.1.0",
+  "description": "Zero-token test-status pane: parses test-runner output from Bash results, shows pass/fail/skip, newly failing tests and skip-count increases (possible test weakening).",
+  "author": {
+    "name": "silouone",
+    "url": "https://github.com/silouone"
+  },
+  "types": "./types/index.d.ts"
+}

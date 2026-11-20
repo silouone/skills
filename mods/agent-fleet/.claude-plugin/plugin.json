@@ -1,0 +1,10 @@
+{
+  "name": "agent-fleet",
+  "version": "0.1.0",
+  "description": "Fleet panel: a live pane of every subagent in the session (status, model, elapsed, tools, tokens, last tool), a status line while any runs, toasts on long completions, and /fleet [cost] tables.",
+  "author": {
+    "name": "silouone",
+    "url": "https://github.com/silouone"
+  },
+  "types": "./types/index.d.ts"
+}
