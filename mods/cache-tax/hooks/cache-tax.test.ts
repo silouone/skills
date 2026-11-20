@@ -190,6 +190,36 @@ describe('cold-cache warning', () => {
     expect(world.forks).toBe(0)
   })
 
+  test('a new prompt after a cold gap clears the warning, keeps it away during the turn, and restarts the countdown', { options: { autoHandoff: false } }, async ($, on) => {
+    const { clock } = worldOf(on, usageOf(142_000, 71))
+    stepsAnswer(on, () => WARM)
+    await start($)
+    await runTurn($, clock, WARM)
+    await clock.advance(73 * MIN)
+    expect((await bandText($)).warning).toContain('cache likely cold')
+
+    // Back: a long agentic turn, several requests over six minutes. Each one reads the cache.
+    await $.turn.start({ text: 'go on', turnId: 'back' })
+
+    for (const index of [0, 1, 2]) {
+      for await (const chunk of $.turn.step({ turnId: 'back', index, model: 'claude-opus-5-5', messageCount: 3 + index })) {
+        void chunk
+      }
+
+      await clock.advance(2 * MIN)
+      expect((await bandText($)).warning).toBeUndefined()
+    }
+
+    await $.turn.complete({ answer: 'done', durationMs: 6 * MIN, isAborted: false, turnId: 'back', reason: 'answer', usage: { ...WARM, model: 'claude-opus-5-5' } })
+    expect((await bandText($)).warning).toBeUndefined()
+
+    // The countdown restarts from the last activity: quiet for the lifetime, back after it.
+    await clock.advance(58 * MIN)
+    expect((await bandText($)).warning).toBeUndefined()
+    await clock.advance(3 * MIN)
+    expect((await bandText($)).warning).toContain('cache likely cold')
+  })
+
   test('the token threshold is respected: a small context never warns', async ($, on) => {
     const { clock } = worldOf(on, usageOf(5_000, 3))
     stepsAnswer(on, () => WARM)

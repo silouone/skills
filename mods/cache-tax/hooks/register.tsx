@@ -411,6 +411,8 @@ export const register: Register = (on, options) => {
 
       stretch += 1
       turns.set(e.turnId, { idleGapMs: at === null ? null : now - at, usage: ZERO, first: null, tools: 0 })
+      // The countdown restarts here: the turn's first request reads (or rewrites) the cache.
+      await update($, lastAt, () => now)
       cancelWarm()
 
       if ((await read($, cold)) !== null) {
@@ -433,6 +435,12 @@ export const register: Register = (on, options) => {
       acc.usage = add(acc.usage, result.usage)
       acc.first ??= result.usage
       acc.tools += result.toolUses.length
+    }
+
+    // Every main-loop request reads the cache: a long agentic turn keeps the countdown at zero.
+    if (e.agentId === undefined) {
+      const now = await $.clock.now()
+      await update($, lastAt, () => now)
     }
 
     if (e.agentId === undefined && cfg.autoHandoff && (await read($, isInteractive))) {
@@ -473,6 +481,11 @@ export const register: Register = (on, options) => {
     const first = acc?.first ?? e.usage
 
     await update($, lastAt, () => now)
+
+    // Don't wait for the next tick to take down a warning raised before this turn's activity counted.
+    if ((await read($, cold)) !== null) {
+      await update($, cold, () => null)
+    }
 
     if (usage === undefined || first === undefined) {
       if (await read($, isInteractive)) {
