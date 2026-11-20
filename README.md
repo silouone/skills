@@ -16,6 +16,20 @@ Nothing is uploaded anywhere.
 | [`sitrep`](./skills/sitrep) | "Where are we at?" — one scannable, evidence-first status report on the current session: objective with measured %, in-flight task, subagent states, ETA in countable units, blockers, next action. Disk first, conversation second; never invents a number. |
 | [`keep-alive`](./skills/keep-alive) | `/keep-alive 3` keeps the current Claude Code session's prompt cache warm for 3 hours while you're away. A launchd ping resumes a fork of the session, checks that it really read from cache, and stops with a notification if it didn't. Claude Code on macOS. |
 
+## The mods
+
+Mods change Claude Code itself (a plugin with a hooks module: a band above the prompt,
+commands, timers), so they are **Claude Code only**. One folder each under [`mods/`](./mods).
+
+| Mod | What it does |
+|---|---|
+| [`cache-tax`](./mods/cache-tax) | A band above the prompt with context fill, rate-limit headroom and the last turn's cache hit rate, and a warning when an idle gap has let the prompt cache go cold. `/ctx` measures your real cache lifetime, `/keepwarm` refreshes it while you're away, and a handoff document is written from the still-warm cache just before it expires, or when the context window is nearly full, so a cold cache or a full window never costs you the work. |
+
+Load a mod from a clone: one session with `claude --plugin-dir /path/to/skills/mods/cache-tax`,
+every session by adding that absolute path to `CLAUDE_CODE_PLUGIN_DIRS`
+([wiring](./mods/cache-tax/WIRING.md)). `cache-tax`'s only network calls are model requests
+through your own session (its refresh and handoff forks); handoffs land in `~/.claude/handoffs/`.
+
 ## Install (1 minute)
 
 Two routes, two philosophies. The **plugin** subscribes you to the set as a

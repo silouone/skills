@@ -94,3 +94,6 @@ captions), and each skill's docs must state exactly which calls those are.
 5. README skill index updated. Both install routes discover skills from the
    directory listing, so a new skill needs no installer edit — but it does
    need an entry in `plugin.json`.
+6. For a mod: `claude plugin validate mods/<name>` and
+   `claude plugin test mods/<name>` pass, its README states its network calls
+   (§4), and the README mods table is updated.

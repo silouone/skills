@@ -19,6 +19,8 @@ How a ping works, all in [`scripts/keep_alive.py`](scripts/keep_alive.py):
 
 **Runtime:** Claude Code on macOS only. It needs `claude` on `PATH`, `launchctl` and `CLAUDE_CODE_SESSION_ID` (Claude Code sets it in the shell). Codex has no equivalent: no headless resume-and-fork of the current session.
 
+**Related:** in a session you keep open, the [`cache-tax`](https://github.com/silouone/skills/tree/main/mods/cache-tax) mod's `/keepwarm` does this in-process, and also writes a handoff document before the cache expires. Use one or the other: both at once ping twice. Keep-alive is the one that still works once the terminal is closed.
+
 ## Steps
 
 `S` is this skill's `scripts/keep_alive.py`. Run it with `python3`.

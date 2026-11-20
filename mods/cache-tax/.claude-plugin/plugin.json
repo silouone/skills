@@ -1,0 +1,54 @@
+{
+  "name": "cache-tax",
+  "version": "0.2.0",
+  "description": "Context, cache and rate-limit weather band above the prompt; warns when the prompt cache has likely gone cold; /ctx history, opt-in /keepwarm, and an automatic handoff document written from the warm cache before it expires or the context window fills.",
+  "author": {
+    "name": "silouone",
+    "url": "https://github.com/silouone"
+  },
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "cacheLifetimeMinutes": {
+      "type": "number",
+      "title": "Cache lifetime (minutes)",
+      "description": "Idle minutes after which the prompt cache is assumed cold. Correct it from /ctx's measured estimate.",
+      "default": 60
+    },
+    "safetyMarginMinutes": {
+      "type": "number",
+      "title": "Keep-warm safety margin (minutes)",
+      "description": "How long before the cache lifetime elapses a keep-warm refresh fires.",
+      "default": 5
+    },
+    "warnTokenThreshold": {
+      "type": "number",
+      "title": "Warning token threshold",
+      "description": "The cold-cache warning shows only when the context holds more tokens than this.",
+      "default": 20000
+    },
+    "keepWarmMaxRefreshes": {
+      "type": "number",
+      "title": "Keep-warm refresh cap",
+      "description": "Most keep-warm refreshes in one idle stretch.",
+      "default": 6
+    },
+    "keepWarmDefault": {
+      "type": "boolean",
+      "title": "Keep-warm on by default",
+      "description": "Start each session with /keepwarm on.",
+      "default": false
+    },
+    "autoHandoff": {
+      "type": "boolean",
+      "title": "Auto-handoff before the cache expires",
+      "description": "Just before an idle session's prompt cache expires (or at the keep-warm cap), and once when the context window is nearly full, fork the session into a handoff document under ~/.claude/handoffs/.",
+      "default": true
+    },
+    "lowContextPercent": {
+      "type": "number",
+      "title": "Last-chance handoff: % of context left",
+      "description": "Hand off once when this much of the context window or less is left (auto-compact off means a full window ends the session). 0 turns it off.",
+      "default": 5
+    }
+  }
+}

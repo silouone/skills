@@ -22,6 +22,12 @@ config paths, a missing capability — name both cases inline
 (`~/.claude/settings.json` *or* `~/.codex/config.toml`). A divergence too big
 to write that way earns its own section in the skill.
 
+Mods are the other kind of folder: `mods/<name>/` is a Claude Code plugin with a hooks
+module (`.claude-plugin/plugin.json`, `hooks/register.tsx`, tests beside it). Claude Code
+only, not part of the skills plugin, not checked by `check_skills.py`: check one with
+`claude plugin validate mods/<name>` and `claude plugin test mods/<name>`. Its
+`.claude-plugin/types/` is engine-generated and never committed.
+
 ## Invariants
 
 Enforced by `python3 tools/check_skills.py`, not by discipline:
